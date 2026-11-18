@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #111111;
+      --surface: #1c1c1c;
+      --surface2: #2a2a2a;
+      --border: #3a3a3a;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --success: #ffffff;
+      --error: #555555;
+      --accent: #ffffff;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--text);
+    }
+
+    .logo span {
+      color: var(--text);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .tab-btn {
+      padding: 8px 22px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+
+    .tab-btn.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .progress-wrap {
+      font-size: .82rem;
+      color: var(--muted);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .range-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: .82rem;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+
+    .range-select:hover,
+    .range-select:focus {
+      border-color: var(--muted);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .word-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 48px;
+      text-align: center;
+      position: relative;
+      min-width: 240px;
+      transition: border-color .25s;
+    }
+
+    .word-card .card-result {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity .25s;
+      line-height: 1;
+    }
+
+    .word-card.result-correct {
+      border-color: rgba(255, 255, 255, .7);
+    }
+
+    .word-card.result-correct .card-result {
+      opacity: 1;
+      color: #ffffff;
+    }
+
+    .word-card.result-wrong {
+      border-color: #555555;
+    }
+
+    .word-card.result-wrong .card-result {
+      opacity: 1;
+      color: #666666;
+    }
+
+    .word-card .type-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .6px;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .word-phonetic {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .word-en {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -.5px;
+    }
+
+    .word-divider {
+      display: none;
+    }
+
+    .word-type-label {
+      display: none;
+    }
+
+
+    .question-label {
+      font-size: .9rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .option-btn {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      padding: 11px 14px;
+      font-size: .88rem;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color .15s, background .15s, transform .1s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--text);
+      background: var(--surface2);
+      transform: translateY(-1px);
+    }
+
+    .option-btn .opt-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--surface2);
+      font-size: .72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+
+    .option-btn.correct {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .option-btn.correct .opt-letter {
+      background: #ffffff;
+      color: #111;
+    }
+
+    .option-btn.wrong {
+      border-color: #444444;
+      background: rgba(255, 255, 255, .02);
+      opacity: .55;
+    }
+
+    .option-btn.wrong .opt-letter {
+      background: #444444;
+      color: var(--text);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .feedback {
+      display: none;
+    }
+
+    .word-definition {
+      display: none;
+      font-size: .78rem;
+      font-style: italic;
+      color: var(--muted);
+      text-align: center;
+      max-width: 500px;
+      line-height: 1.65;
+      animation: fadeIn .25s ease;
+    }
+
+    .word-definition strong {
+      font-style: normal;
+      color: var(--text);
+    }
+
+    .word-definition.visible {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .sentence-word-display {
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: -.5px;
+    }
+
+    .sentence-word-az {
+      font-size: 1.1rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -12px;
+    }
+
+    .sentence-hint {
+      font-size: .85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .sentence-hint span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .sentence-input-wrap {
+      width: 100%;
+      position: relative;
+    }
+
+    .sentence-textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      font-size: 1.05rem;
+      color: var(--text);
+      resize: none;
+      min-height: 100px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+      line-height: 1.6;
+    }
+
+    .sentence-textarea:focus {
+      border-color: var(--text);
+    }
+
+    .sentence-textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .sentence-textarea.has-word {
+      border-color: rgba(255, 255, 255, .4);
+    }
+
+    .sentence-textarea.missing-word {
+      border-color: #555;
+      animation: shake .3s;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-6px);
+      }
+
+      75% {
+        transform: translateX(6px);
+      }
+    }
+
+    .word-highlight-note {
+      font-size: .78rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .word-highlight-note.ok {
+      color: var(--text);
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .footer-left {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .ghost-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: .88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+
+    .ghost-btn:hover {
+      color: var(--text);
+    }
+
+    .footer-divider {
+      display: inline-block;
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .primary-btn {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 24px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background .2s, border-color .2s;
+    }
+
+    .primary-btn:hover:not(.btn-inactive) {
+      background: var(--border);
+    }
+
+    .primary-btn.btn-inactive {
+      opacity: 0.35;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .primary-btn.purple {
+      background: var(--surface2);
+      border-color: var(--text);
+    }
+
+    .primary-btn.purple:hover {
+      background: var(--border);
+      border-color: var(--text);
+    }
+
+    .prog-bar-wrap {
+      width: 100%;
+      max-width: 680px;
+      margin-bottom: 15px;
+    }
+
+    .prog-bar-track {
+      height: 2px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--muted), var(--text));
+      border-radius: 99px;
+      transition: width .4s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .complete-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, .96);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .complete-overlay.show {
+      display: flex;
+    }
+
+    .complete-emoji {
+      font-size: 4rem;
+    }
+
+    .complete-title {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .complete-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 320px;
+    }
+
+    @media (max-width: 520px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 12px 16px;
+      }
+
+      main {
+        padding: 40px 20px;
+        justify-content: flex-start;
+        flex: 0;
+      }
+
+      .screen.active {
+        gap: 20px;
+      }
+
+      footer {
+        padding: 12px 16px;
+        gap: 8px;
+        margin-top: 144px;
+      }
+
+      .word-en {
+        font-size: 1.8rem;
+      }
+
+      .word-card {
+        padding: 24px 20px;
+      }
+
+      .ghost-btn {
+        font-size: .8rem;
+      }
+
+      .primary-btn {
+        padding: 9px 16px;
+        font-size: .82rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header>
+      <div class="logo">English Words<span></span></div>
+
+      <div class="tabs" style="display:none">
+        <button class="tab-btn active" id="tab-quiz" onclick="switchTab('quiz')">Words</button>
+        <button class="tab-btn" id="tab-sent" onclick="switchTab('sentence')">Sentence</button>
+      </div>
+
+      <select class="range-select" id="range-select" onchange="onRangeChange()">
+        <option value="0-50">1 – 50</option>
+        <option value="50-100">51 – 100</option>
+        <option value="100-150">101 – 150</option>
+        <option value="150-200">151 – 200</option>
+        <option value="200-250">201 – 250</option>
+        <option value="250-300">251 – 300</option>
+        <option value="300-350">301 – 350</option>
+        <option value="350-400">351 – 400</option>
+        <option value="400-450">401 – 450</option>
+        <option value="450-488">451 – 488</option>
+      </select>
+    </header>
+
+    <main>
+
+      <div class="screen active" id="screen-quiz">
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-track">
+            <div class="prog-bar-fill" id="prog-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="word-card" id="quiz-card">
+          <span class="type-badge" id="quiz-badge">noun</span>
+          <span class="card-result" id="card-result"></span>
+          <div class="word-phonetic" id="quiz-phonetic">/wɜːrd/</div>
+          <div class="word-en" id="quiz-word">word</div>
+        </div>
+
+        <div class="options-grid" id="options-grid"></div>
+
+        <div class="word-definition" id="word-definition"></div>
+
+        <div class="feedback" id="quiz-feedback"></div>
+      </div>
+
+
+    </main>
+
+    <footer>
+      <div class="footer-left">
+        <button class="ghost-btn" onclick="restartCurrent()">Again</button>
+        <span class="footer-divider"></span>
+        <button class="ghost-btn" id="show-answer-btn" onclick="showAnswer()" style="display:none">Show Answer
+        </button>
+      </div>
+      <button class="primary-btn" id="next-btn" onclick="nextWord()">
+        Continue
+      </button>
+    </footer>
+
+  </div>
+
+  <div class="complete-overlay" id="complete-overlay">
+    <div class="complete-emoji">🎉</div>
+    <div class="complete-title">Congratulations!</div>
+    <button class="primary-btn purple" style="margin-top:16px" onclick="restartAll()">
+      ↺ Again
+    </button>
+  </div>
+
+
+
+  <script src="words.js"></script>
+  <script>
+    let currentTab = 'quiz';
+    let currentIdx = 0;
+    let answered = false;
+    let sentDone = false;
+    let rangeStart = 0;
+    let rangeEnd = 50;
+    let activeWords = [];
+
+    function switchTab(tab) {
+      currentTab = tab;
+      currentIdx = 0;
+      document.getElementById('tab-quiz').classList.toggle('active', tab === 'quiz');
+      document.getElementById('tab-sent').classList.toggle('active', tab === 'sentence');
+      document.getElementById('screen-quiz').classList.toggle('active', tab === 'quiz');
+      document.getElementById('screen-sentence').classList.toggle('active', tab === 'sentence');
+      renderCurrent();
+    }
+
+    function renderCurrent() {
+      if (currentIdx >= activeWords.length) { showComplete(); return; }
+      const w = activeWords[currentIdx];
+      updateProgress();
+
+      if (currentTab === 'quiz') renderQuiz(w);
+      else renderSentence(w);
+    }
+
+    function renderQuiz(w) {
+      answered = false;
+
+      const card = document.getElementById('quiz-card');
+      card.className = 'word-card';
+      const badge = document.getElementById('quiz-badge');
+      badge.className = 'type-badge';
+      badge.textContent = w.type.toLocaleUpperCase('en-US');
+      document.getElementById('quiz-phonetic').textContent = w.phonetic;
+      document.getElementById('quiz-word').textContent = w.en;
+
+      const res = document.getElementById('card-result');
+      res.textContent = '';
+
+      const defEl = document.getElementById('word-definition');
+      defEl.textContent = '';
+      defEl.classList.remove('visible');
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const opts = shuffle([w.az, ...w.wrongs]);
+      const grid = document.getElementById('options-grid');
+      grid.innerHTML = '';
+      opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+        btn.onclick = () => selectOption(btn, opt, w.az);
+        grid.appendChild(btn);
+      });
+
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.classList.add('btn-inactive');
+      document.getElementById('show-answer-btn').style.display = 'inline-flex';
+      setNextLabel();
+    }
+
+    function selectOption(btn, chosen, correct) {
+      if (answered) return;
+      answered = true;
+      const allBtns = document.querySelectorAll('.option-btn');
+      allBtns.forEach(b => b.disabled = true);
+
+      const card = document.getElementById('quiz-card');
+      const res = document.getElementById('card-result');
+      const defEl = document.getElementById('word-definition');
+      const w = activeWords[currentIdx];
+
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        card.classList.add('result-correct');
+        res.textContent = '✓';
+      } else {
+        btn.classList.add('wrong');
+        card.classList.add('result-wrong');
+        res.textContent = '✗';
+        allBtns.forEach(b => {
+          if (b.textContent.trim().slice(1).trim() === correct) b.classList.add('correct');
+        });
+      }
+
+      if (w.def) { defEl.innerHTML = `<strong>${w.en}</strong> — ${w.def}`; defEl.classList.add('visible'); }
+      document.getElementById('next-btn').classList.remove('btn-inactive');
+    }
+
+    function showAnswer() {
+      if (answered) return;
+      answered = true;
+      const w = activeWords[currentIdx];
+      const allBtns = document.querySelectorAll('.option-btn');
+      allBtns.forEach(b => {
+        b.disabled = true;
+        const label = b.textContent.trim().slice(1).trim();
+        if (label === w.az) b.classList.add('correct');
+      });
+      const card = document.getElementById('quiz-card');
+      const res = document.getElementById('card-result');
+      const defEl = document.getElementById('word-definition');
+      card.classList.add('result-correct');
+      res.textContent = '✓';
+      if (w.def) { defEl.innerHTML = `<strong>${w.en}</strong> — ${w.def}`; defEl.classList.add('visible'); }
+      document.getElementById('next-btn').classList.remove('btn-inactive');
+    }
+
+    function renderSentence(w) {
+      sentDone = false;
+      document.getElementById('sent-word').textContent = w.en;
+      document.getElementById('sent-word-az').textContent = `(${w.az})`;
+      document.getElementById('sent-word-span').textContent = w.en;
+      const ta = document.getElementById('sent-textarea');
+      ta.value = '';
+      ta.className = 'sentence-textarea';
+      document.getElementById('sent-note').textContent = 'Söz hələ istifadə edilməyib';
+      document.getElementById('sent-note').className = 'word-highlight-note';
+
+      document.getElementById('next-btn').disabled = true;
+      document.getElementById('show-answer-btn').style.display = 'none';
+
+      const btn = document.getElementById('next-btn');
+      btn.textContent = '';
+      btn.innerHTML = 'Yoxla ✓';
+      btn.onclick = submitSentence;
+      btn.disabled = false;
+    }
+
+    function checkWordPresence() {
+      const w = activeWords[currentIdx];
+      const val = document.getElementById('sent-textarea').value;
+      const ta = document.getElementById('sent-textarea');
+      const note = document.getElementById('sent-note');
+      const reg = new RegExp(`\\b${w.en}\\b`, 'i');
+      if (reg.test(val)) {
+        ta.classList.remove('missing-word');
+        ta.classList.add('has-word');
+        note.textContent = `✓ "${w.en}" sözü istifadə edildi`;
+        note.className = 'word-highlight-note ok';
+      } else {
+        ta.classList.remove('has-word');
+        ta.classList.remove('missing-word');
+        note.textContent = 'Söz hələ istifadə edilməyib';
+        note.className = 'word-highlight-note';
+      }
+    }
+
+    function submitSentence() {
+      const w = activeWords[currentIdx];
+      const val = document.getElementById('sent-textarea').value.trim();
+      const ta = document.getElementById('sent-textarea');
+      const reg = new RegExp(`\\b${w.en}\\b`, 'i');
+      if (!val || !reg.test(val)) {
+        ta.classList.add('missing-word');
+        setTimeout(() => ta.classList.remove('missing-word'), 400);
+        return;
+      }
+      sentDone = true;
+      ta.disabled = true;
+      const btn = document.getElementById('next-btn');
+      btn.innerHTML = currentIdx < activeWords.length - 1 ? 'Continue' : 'Finish';
+      btn.onclick = nextWord;
+    }
+
+    function nextWord() {
+      if (!answered) return;
+      if (currentTab === 'sentence' && !sentDone) { submitSentence(); return; }
+      currentIdx++;
+      localStorage.setItem('progress', currentIdx);
+      if (currentIdx >= activeWords.length) { showComplete(); return; }
+
+      const btn = document.getElementById('next-btn');
+      btn.classList.add('btn-inactive');
+      setNextLabel();
+
+      renderCurrent();
+    }
+
+    function setNextLabel() {
+      const btn = document.getElementById('next-btn');
+      btn.textContent = currentIdx < activeWords.length - 1 ? 'Continue' : 'Finish';
+    }
+
+    function restartCurrent() {
+      if (currentTab === 'sentence') {
+        sentDone = false;
+        const ta = document.getElementById('sent-textarea');
+        ta.disabled = false;
+        ta.value = '';
+        ta.className = 'sentence-textarea';
+        document.getElementById('sent-note').textContent = 'Söz hələ istifadə edilməyib';
+        document.getElementById('sent-note').className = 'word-highlight-note';
+        const btn = document.getElementById('next-btn');
+        btn.innerHTML = 'Yoxla ✓';
+        btn.onclick = submitSentence;
+        btn.disabled = false;
+      } else {
+        renderQuiz(activeWords[currentIdx]);
+      }
+    }
+
+    function restartAll() {
+      currentIdx = 0;
+      localStorage.removeItem('progress');
+      document.getElementById('next-btn').classList.add('btn-inactive');
+      document.getElementById('complete-overlay').classList.remove('show');
+      document.getElementById('complete-overlay').style.display = '';
+      renderCurrent();
+    }
+
+    function showComplete() {
+      localStorage.removeItem('progress');
+      const ov = document.getElementById('complete-overlay');
+      const msgEl = document.getElementById('complete-msg');
+      if (msgEl) {
+        msgEl.textContent =
+          `${activeWords.length}/${activeWords.length} complated! 🏆`;
+      }
+      ov.classList.add('show');
+      ov.style.display = 'flex';
+    }
+
+    function onRangeChange() {
+      const val = document.getElementById('range-select').value;
+      const [s, e] = val.split('-').map(Number);
+      rangeStart = s; rangeEnd = e;
+      activeWords = WORDS.slice(s, e);
+      currentIdx = 0;
+      localStorage.setItem('range', val);
+      localStorage.removeItem('progress');
+      document.getElementById('complete-overlay').classList.remove('show');
+      renderCurrent();
+    }
+
+    function updateProgress() {
+      const pct = activeWords.length ? (currentIdx / activeWords.length) * 100 : 0;
+      document.getElementById('prog-fill').style.width = pct + '%';
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    (function init() {
+      const savedRange = localStorage.getItem('range') || '0-50';
+      const sel = document.getElementById('range-select');
+      sel.value = savedRange;
+      const [s, e] = savedRange.split('-').map(Number);
+      rangeStart = s; rangeEnd = e;
+      activeWords = WORDS.slice(s, e);
+
+      const savedIdx = parseInt(localStorage.getItem('progress') || '0');
+      currentIdx = Math.min(savedIdx, activeWords.length);
+
+      if (currentIdx >= activeWords.length) {
+        showComplete();
+      } else {
+        renderCurrent();
+      }
+    })();
+  </script>
+</body>
+
+</html>
